@@ -3,6 +3,11 @@ import torch.nn.functional as F
 from models.pointnet2_utils import PointNetSetAbstraction, PointNetFeaturePropagation
 
 
+"""
+分割网络
+"""
+
+
 class get_model(nn.Module):
     def __init__(self, num_classes):
         super(get_model, self).__init__()

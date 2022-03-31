@@ -5,6 +5,11 @@ from time import time
 import numpy as np
 
 
+"""
+Set Abstraction 提取局部特征
+"""
+
+
 def timeit(tag, t):
     print("{}: {}s".format(tag, time() - t))
     return time()
@@ -66,6 +71,7 @@ def index_points(points, idx):
 
 def farthest_point_sample(xyz, npoint):
     """
+    Description: Sampling, 最远点采样(FPS)
     Input:
         xyz: pointcloud data, [B, N, 3]
         npoint: number of samples
@@ -90,6 +96,7 @@ def farthest_point_sample(xyz, npoint):
 
 def query_ball_point(radius, nsample, xyz, new_xyz):
     """
+    Description: Grouping, 利用Ball Query划一个R为半径的圈, 将每个圈里面的点云作为一簇
     Input:
         radius: local region radius
         nsample: max sample number in local region
@@ -114,6 +121,7 @@ def query_ball_point(radius, nsample, xyz, new_xyz):
 
 def sample_and_group(npoint, radius, nsample, xyz, points, returnfps=False):
     """
+    Description: Sampling+Groupling
     Input:
         npoint:
         radius:
