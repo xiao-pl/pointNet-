@@ -96,18 +96,23 @@ def showpoints(xyz, c_gt=None, c_pred=None, waittime=0, showrot=False, magnifyBl
         )
 
         if magnifyBlue > 0:
-            show[:, :, 0] = np.maximum(show[:, :, 0], np.roll(show[:, :, 0], 1, axis=0))
+            show[:, :, 0] = np.maximum(
+                show[:, :, 0], np.roll(show[:, :, 0], 1, axis=0))
             if magnifyBlue >= 2:
-                show[:, :, 0] = np.maximum(show[:, :, 0], np.roll(show[:, :, 0], -1, axis=0))
-            show[:, :, 0] = np.maximum(show[:, :, 0], np.roll(show[:, :, 0], 1, axis=1))
+                show[:, :, 0] = np.maximum(
+                    show[:, :, 0], np.roll(show[:, :, 0], -1, axis=0))
+            show[:, :, 0] = np.maximum(
+                show[:, :, 0], np.roll(show[:, :, 0], 1, axis=1))
             if magnifyBlue >= 2:
-                show[:, :, 0] = np.maximum(show[:, :, 0], np.roll(show[:, :, 0], -1, axis=1))
+                show[:, :, 0] = np.maximum(
+                    show[:, :, 0], np.roll(show[:, :, 0], -1, axis=1))
         if showrot:
             cv2.putText(show, 'xangle %d' % (int(xangle / np.pi * 180)), (30, showsz - 30), 0, 0.5,
                         cv2.cv.CV_RGB(255, 0, 0))
             cv2.putText(show, 'yangle %d' % (int(yangle / np.pi * 180)), (30, showsz - 50), 0, 0.5,
                         cv2.cv.CV_RGB(255, 0, 0))
-            cv2.putText(show, 'zoom %d%%' % (int(zoom * 100)), (30, showsz - 70), 0, 0.5, cv2.cv.CV_RGB(255, 0, 0))
+            cv2.putText(show, 'zoom %d%%' % (int(zoom * 100)),
+                        (30, showsz - 70), 0, 0.5, cv2.cv.CV_RGB(255, 0, 0))
 
     changed = True
     while True:
@@ -174,10 +179,14 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', type=str, default='../data/shapenet', help='dataset path')
-    parser.add_argument('--category', type=str, default='Airplane', help='select category')
-    parser.add_argument('--npoints', type=int, default=2500, help='resample points number')
-    parser.add_argument('--ballradius', type=int, default=10, help='ballradius')
+    parser.add_argument('--dataset', type=str,
+                        default='../data/shapenet', help='dataset path')
+    parser.add_argument('--category', type=str,
+                        default='Airplane', help='select category')
+    parser.add_argument('--npoints', type=int, default=2500,
+                        help='resample points number')
+    parser.add_argument('--ballradius', type=int,
+                        default=10, help='ballradius')
     opt = parser.parse_args()
     '''
     Airplane	02691156
@@ -210,10 +219,11 @@ if __name__ == '__main__':
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     ROOT_DIR = os.path.dirname(BASE_DIR)
     sys.path.append(BASE_DIR)
+    sys.path.append(ROOT_DIR)
     sys.path.append(os.path.join(ROOT_DIR, 'data_utils'))
 
-    from ShapeNetDataLoader import PartNormalDataset
-    root = '../data/shapenetcore_partanno_segmentation_benchmark_v0_normal/'
+    from data_utils.ShapeNetDataLoader import PartNormalDataset
+    root = 'E:/点云数据/shapenetcore_partanno_segmentation_benchmark_v0/'
     dataset = PartNormalDataset(root=root, npoints=2048, split='test', normal_channel=False)
     idx = np.random.randint(0, len(dataset))
     data = dataset[idx]
@@ -225,4 +235,3 @@ if __name__ == '__main__':
     pred = cmap[seg, :]
     showpoints(point_set, gt, c_pred=pred, waittime=0, showrot=False, magnifyBlue=0, freezerot=False,
                background=(255, 255, 255), normalizecolor=True, ballradius=opt.ballradius)
-

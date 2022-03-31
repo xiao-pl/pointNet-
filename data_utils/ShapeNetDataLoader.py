@@ -6,6 +6,7 @@ import numpy as np
 from torch.utils.data import Dataset
 warnings.filterwarnings('ignore')
 
+
 def pc_normalize(pc):
     centroid = np.mean(pc, axis=0)
     pc = pc - centroid
@@ -13,14 +14,14 @@ def pc_normalize(pc):
     pc = pc / m
     return pc
 
+
 class PartNormalDataset(Dataset):
-    def __init__(self,root = './data/shapenetcore_partanno_segmentation_benchmark_v0_normal', npoints=2500, split='train', class_choice=None, normal_channel=False):
+    def __init__(self, root='./data/shapenetcore_partanno_segmentation_benchmark_v0_normal', npoints=2500, split='train', class_choice=None, normal_channel=False):
         self.npoints = npoints
         self.root = root
         self.catfile = os.path.join(self.root, 'synsetoffset2category.txt')
         self.cat = {}
         self.normal_channel = normal_channel
-
 
         with open(self.catfile, 'r') as f:
             for line in f:
@@ -29,8 +30,8 @@ class PartNormalDataset(Dataset):
         self.cat = {k: v for k, v in self.cat.items()}
         self.classes_original = dict(zip(self.cat, range(len(self.cat))))
 
-        if not class_choice is  None:
-            self.cat = {k:v for k,v in self.cat.items() if k in class_choice}
+        if class_choice is not None:
+            self.cat = {k: v for k, v in self.cat.items() if k in class_choice}
         # print(self.cat)
 
         self.meta = {}
@@ -43,11 +44,12 @@ class PartNormalDataset(Dataset):
         for item in self.cat:
             # print('category', item)
             self.meta[item] = []
-            dir_point = os.path.join(self.root, self.cat[item])
+            dir_point = os.path.join(self.root, self.cat[item], 'points')
             fns = sorted(os.listdir(dir_point))
             # print(fns[0][0:-4])
             if split == 'trainval':
-                fns = [fn for fn in fns if ((fn[0:-4] in train_ids) or (fn[0:-4] in val_ids))]
+                fns = [fn for fn in fns if (
+                    (fn[0:-4] in train_ids) or (fn[0:-4] in val_ids))]
             elif split == 'train':
                 fns = [fn for fn in fns if fn[0:-4] in train_ids]
             elif split == 'val':
@@ -61,7 +63,7 @@ class PartNormalDataset(Dataset):
             # print(os.path.basename(fns))
             for fn in fns:
                 token = (os.path.splitext(os.path.basename(fn))[0])
-                self.meta[item].append(os.path.join(dir_point, token + '.txt'))
+                self.meta[item].append(os.path.join(dir_point, token + '.pts'))
 
         self.datapath = []
         for item in self.cat:
@@ -84,7 +86,6 @@ class PartNormalDataset(Dataset):
 
         self.cache = {}  # from index to (point_set, cls, seg) tuple
         self.cache_size = 20000
-
 
     def __getitem__(self, index):
         if index in self.cache:
@@ -113,6 +114,3 @@ class PartNormalDataset(Dataset):
 
     def __len__(self):
         return len(self.datapath)
-
-
-
