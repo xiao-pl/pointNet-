@@ -20,15 +20,26 @@ sys.path.append(os.path.join(ROOT_DIR, 'models'))
 def parse_args():
     '''PARAMETERS'''
     parser = argparse.ArgumentParser('Testing')
-    parser.add_argument('--use_cpu', action='store_true', default=False, help='use cpu mode')
-    parser.add_argument('--gpu', type=str, default='0', help='specify gpu device')
-    parser.add_argument('--batch_size', type=int, default=24, help='batch size in training')
-    parser.add_argument('--num_category', default=40, type=int, choices=[10, 40],  help='training on ModelNet10/40')
-    parser.add_argument('--num_point', type=int, default=1024, help='Point Number')
-    parser.add_argument('--log_dir', type=str, required=True, help='Experiment root')
-    parser.add_argument('--use_normals', action='store_true', default=False, help='use normals')
-    parser.add_argument('--use_uniform_sample', action='store_true', default=False, help='use uniform sampiling')
-    parser.add_argument('--num_votes', type=int, default=3, help='Aggregate classification scores with voting')
+    parser.add_argument('--use_cpu', action='store_true',
+                        default=False, help='use cpu mode')
+    parser.add_argument('--gpu', type=str, default='0',
+                        help='specify gpu device')
+    parser.add_argument('--batch_size', type=int, default=24,
+                        help='batch size in training')
+    parser.add_argument('--num_category', default=40, type=int,
+                        choices=[10, 40],  help='training on ModelNet10/40')
+    parser.add_argument('--num_point', type=int,
+                        default=1024, help='Point Number')
+    # parser.add_argument('--log_dir', type=str,
+    #                     required=True, help='Experiment root')
+    parser.add_argument('--log_dir', type=str,
+                        required=False, help='Experiment root')
+    parser.add_argument('--use_normals', action='store_true',
+                        default=False, help='use normals')
+    parser.add_argument('--use_uniform_sample', action='store_true',
+                        default=False, help='use uniform sampiling')
+    parser.add_argument('--num_votes', type=int, default=3,
+                        help='Aggregate classification scores with voting')
     return parser.parse_args()
 
 
@@ -78,7 +89,8 @@ def main(args):
     args = parse_args()
     logger = logging.getLogger("Model")
     logger.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     file_handler = logging.FileHandler('%s/eval.txt' % experiment_dir)
     file_handler.setLevel(logging.INFO)
     file_handler.setFormatter(formatter)
@@ -88,10 +100,14 @@ def main(args):
 
     '''DATA LOADING'''
     log_string('Load dataset ...')
-    data_path = 'data/modelnet40_normal_resampled/'
+    data_path = 'E:/点云数据/modelnet40_normal_resampled/'
 
-    test_dataset = ModelNetDataLoader(root=data_path, args=args, split='test', process_data=False)
-    testDataLoader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=10)
+    test_dataset = ModelNetDataLoader(
+        root=data_path, args=args, split='test', process_data=False
+    )
+    testDataLoader = torch.utils.data.DataLoader(
+        test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=10
+    )
 
     '''MODEL LOADING'''
     num_class = args.num_category
@@ -102,14 +118,18 @@ def main(args):
     if not args.use_cpu:
         classifier = classifier.cuda()
 
-    checkpoint = torch.load(str(experiment_dir) + '/checkpoints/best_model.pth')
+    checkpoint = torch.load(str(experiment_dir) +
+                            '/checkpoints/best_model.pth')
     classifier.load_state_dict(checkpoint['model_state_dict'])
 
     with torch.no_grad():
-        instance_acc, class_acc = test(classifier.eval(), testDataLoader, vote_num=args.num_votes, num_class=num_class)
-        log_string('Test Instance Accuracy: %f, Class Accuracy: %f' % (instance_acc, class_acc))
+        instance_acc, class_acc = test(
+            classifier.eval(), testDataLoader, vote_num=args.num_votes, num_class=num_class)
+        log_string('Test Instance Accuracy: %f, Class Accuracy: %f' %
+                   (instance_acc, class_acc))
 
 
 if __name__ == '__main__':
     args = parse_args()
+    args.log_dir = 'pointnet2_msg_normals'
     main(args)
